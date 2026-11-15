@@ -1,0 +1,126 @@
+#pragma once
+
+#include <cstddef>
+#include <initializer_list>
+#include <vector>
+
+#include "lib/messages/control_area.h"
+#include "lib/resources/memory_layout.h"
+#include "lib/system/semaphore.h"
+#include "lib/system/semaphore_set.h"
+#include "lib/system/shared_memory.h"
+
+namespace messenger {
+class IIpcResources {
+public:
+    virtual EControlArea& ControlArea() const noexcept = 0;
+
+    virtual MessageQueue& OurMsgQueue() const noexcept = 0;
+    virtual MessageQueue& TheirMsgQueue() const noexcept = 0;
+
+    virtual system::Semaphore OurReadSemaphore() const noexcept = 0;
+    virtual system::Semaphore TheirWriteSemaphore() const noexcept = 0;
+
+    // Handshake socket should be closed after the handshake, so we don't keep it here
+};
+
+class IpcResourcesBase : public IIpcResources {
+public:
+    IpcResourcesBase(unsigned char our_queue_idx, unsigned char their_queue_idx,
+                     unsigned short our_read_sem_idx, unsigned short their_write_sem_idx)
+        : our_queue_idx_(our_queue_idx),
+          their_queue_idx_(their_queue_idx),
+          our_read_sem_idx_(our_read_sem_idx),
+          their_write_sem_idx_(their_write_sem_idx) {}
+
+    EControlArea& ControlArea() const noexcept final {
+        return GetMemoryLayout().control_area;
+    }
+
+    MessageQueue& OurMsgQueue() const noexcept final {
+        return GetMemoryLayout().queues[our_queue_idx_];
+    }
+
+    MessageQueue& TheirMsgQueue() const noexcept final {
+        return GetMemoryLayout().queues[their_queue_idx_];
+    }
+
+    system::Semaphore OurReadSemaphore() const noexcept final {
+        return Semaphores()[our_read_sem_idx_];
+    }
+
+    system::Semaphore TheirWriteSemaphore() const noexcept final {
+        return Semaphores()[their_write_sem_idx_];
+    }
+
+protected:
+    virtual MemoryLayout& GetMemoryLayout() const noexcept = 0;
+    virtual std::vector<system::Semaphore> Semaphores() const noexcept = 0;
+
+private:
+    unsigned char our_queue_idx_;
+    unsigned char their_queue_idx_;
+
+    unsigned short our_read_sem_idx_;
+    unsigned short their_write_sem_idx_;
+};
+
+class IpcResourcesOwner final : public IpcResourcesBase {
+public:
+    IpcResourcesOwner(std::size_t shm_byte_size,
+                      std::initializer_list<unsigned short> sem_initial_values,
+                      unsigned char our_queue_idx, unsigned char their_queue_idx,
+                      unsigned short our_read_sem_idx, unsigned short their_write_sem_idx)
+        : IpcResourcesBase(our_queue_idx, their_queue_idx, our_read_sem_idx, their_write_sem_idx),
+          shared_memory_(shm_byte_size),
+          memory_layout_(reinterpret_cast<MemoryLayout*>(shared_memory_.Data())),
+          semaphore_set_(std::move(sem_initial_values)) {}
+
+    MemoryLayout& GetMemoryLayout() const noexcept {
+        return *memory_layout_;
+    }
+
+    std::vector<system::Semaphore> Semaphores() const noexcept {
+        return semaphore_set_.Semaphores();
+    }
+
+    int SharedMemoryId() const noexcept {
+        return shared_memory_.Id();
+    }
+
+    int SemaphoreSetId() const noexcept {
+        return semaphore_set_.Id();
+    }
+
+private:
+    system::SharedMemoryOwner shared_memory_;
+    MemoryLayout* memory_layout_;
+
+    system::SemaphoreSet semaphore_set_;
+};
+
+class IpcResourcesView final : public IpcResourcesBase {
+public:
+    IpcResourcesView(int shm_id, int sem_set_id, unsigned char our_queue_idx,
+                     unsigned char their_queue_idx, unsigned short our_read_sem_idx,
+                     unsigned short their_write_sem_idx)
+        : IpcResourcesBase(our_queue_idx, their_queue_idx, our_read_sem_idx, their_write_sem_idx),
+          shared_memory_(shm_id),
+          memory_layout_(reinterpret_cast<MemoryLayout*>(shared_memory_.Data())),
+          semaphore_set_(sem_set_id) {}
+
+    MemoryLayout& GetMemoryLayout() const noexcept {
+        return *memory_layout_;
+    }
+
+    std::vector<system::Semaphore> Semaphores() const noexcept {
+        return semaphore_set_.Semaphores();
+    }
+
+private:
+    system::SharedMemoryMap shared_memory_;
+    MemoryLayout* memory_layout_;
+
+    system::SemaphoreSetView semaphore_set_;
+};
+}  // namespace messenger
