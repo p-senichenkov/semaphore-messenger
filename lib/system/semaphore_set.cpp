@@ -13,11 +13,22 @@
 
 using namespace messenger::system;
 
+namespace {
 union SemctlArg {
     int val;
     semid_ds* buf;
     unsigned short* array;
 };
+
+std::vector<Semaphore> CreateSemaphores(int id, unsigned short count) {
+    std::vector<Semaphore> result;
+    result.reserve(count);
+    for (unsigned short idx = 0; idx < count; ++idx) {
+        result.emplace_back(id, idx);
+    }
+    return result;
+}
+}  // namespace
 
 SemaphoreSet::SemaphoreSet(std::initializer_list<unsigned short> initial_values) {
     if (initial_values.size() == 0 ||
@@ -50,12 +61,8 @@ void SemaphoreSet::Reset() noexcept {
     count_ = 0;
 }
 
-Semaphore SemaphoreSet::operator[](std::size_t idx) const {
-    if (idx >= count_) {
-        throw std::out_of_range("semaphore index");
-    }
-
-    return Semaphore{id_, static_cast<unsigned short>(idx)};
+std::vector<Semaphore> SemaphoreSet::Semaphores() const {
+    return CreateSemaphores(id_, count_);
 }
 
 SemaphoreSetView::SemaphoreSetView(int id) : id_(id) {
@@ -69,10 +76,6 @@ SemaphoreSetView::SemaphoreSetView(int id) : id_(id) {
     count_ = info.sem_nsems;
 }
 
-Semaphore SemaphoreSetView::operator[](std::size_t idx) const {
-    if (idx >= count_) {
-        throw std::out_of_range("semaphore index");
-    }
-
-    return Semaphore{id_, static_cast<unsigned short>(idx)};
+std::vector<Semaphore> SemaphoreSetView::Semaphores() const {
+    return CreateSemaphores(id_, count_);
 }

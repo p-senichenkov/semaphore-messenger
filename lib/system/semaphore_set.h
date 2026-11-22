@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <initializer_list>
+#include <vector>
 
 #include <sys/sem.h>
 
@@ -21,11 +22,7 @@ public:
         return id_;
     }
 
-    std::size_t Size() const noexcept {
-        return count_;
-    }
-
-    Semaphore operator[](std::size_t idx) const;
+    std::vector<Semaphore> Semaphores() const;
 
 private:
     unsigned short count_;
@@ -43,11 +40,7 @@ public:
         return id_;
     }
 
-    std::size_t Size() const noexcept {
-        return count_;
-    }
-
-    Semaphore operator[](std::size_t idx) const;
+    std::vector<Semaphore> Semaphores() const;
 
 private:
     unsigned short count_;

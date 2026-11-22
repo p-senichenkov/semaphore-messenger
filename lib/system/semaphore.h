@@ -20,6 +20,10 @@ public:
         Operate(+1);
     }
 
+    bool CanDecImmediately() const {
+        return Get() > 0;
+    }
+
 private:
     void Operate(short delta) const {
         sembuf op{index_, delta, 0};
@@ -29,6 +33,14 @@ private:
             }
             throw SystemError{"semop"};
         }
+    }
+
+    int Get() const {
+        int val = semctl(set_id_, index_, GETVAL);
+        if (val < 0) {
+            throw SystemError{"semctl"};
+        }
+        return val;
     }
 
     int set_id_;

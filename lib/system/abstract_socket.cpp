@@ -46,6 +46,7 @@ AbstractSocket::~AbstractSocket() {
 AbstractSocket AbstractSocket::Accept(std::string_view name) const {
     int fd;
     do {
+        // TODO: Timeout here
         fd = accept4(fd_, nullptr, nullptr, SOCK_CLOEXEC);
     } while (fd == -1 && errno == EINTR);
 
