@@ -3,8 +3,8 @@
 #include <stdexcept>
 #include <utility>
 
-#include "lib/handshake/socket_utils.h"
-#include "lib/messages/handshake.h"
+#include "lib/core/handshake/socket_utils.h"
+#include "lib/core/messages/handshake.h"
 
 namespace messenger::handshake {
 class HandshakeConnection {

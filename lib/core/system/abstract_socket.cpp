@@ -7,7 +7,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 
-#include "lib/system/system_error.h"
+#include "lib/core/system/system_error.h"
 
 using namespace messenger::system;
 

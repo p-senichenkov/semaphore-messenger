@@ -6,7 +6,7 @@
 
 #include <sys/sem.h>
 
-#include "lib/system/semaphore.h"
+#include "lib/core/system/semaphore.h"
 
 namespace messenger::system {
 /// @brief An owning handle to a semaphore set

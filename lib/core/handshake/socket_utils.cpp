@@ -1,8 +1,8 @@
-#include "lib/handshake/socket_utils.h"
+#include "lib/core/handshake/socket_utils.h"
 
 #include <string>
 
-#include "lib/system/abstract_socket.h"
+#include "lib/core/system/abstract_socket.h"
 
 using namespace messenger;
 using namespace messenger::handshake;
