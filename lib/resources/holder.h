@@ -5,6 +5,8 @@
 #include <vector>
 
 #include "lib/messages/control_area.h"
+#include "lib/messages/handshake.h"
+#include "lib/messages/user_text.h"
 #include "lib/resources/memory_layout.h"
 #include "lib/system/semaphore.h"
 #include "lib/system/semaphore_set.h"
@@ -15,8 +17,8 @@ class IIpcResources {
 public:
     virtual EControlArea& ControlArea() const noexcept = 0;
 
-    virtual MessageQueue& OurMsgQueue() const noexcept = 0;
-    virtual MessageQueue& TheirMsgQueue() const noexcept = 0;
+    virtual UserTextMsg& OurMsgPlace() const noexcept = 0;
+    virtual UserTextMsg& TheirMsgPlace() const noexcept = 0;
 
     virtual system::Semaphore OurReadSemaphore() const noexcept = 0;
     virtual system::Semaphore TheirWriteSemaphore() const noexcept = 0;
@@ -37,12 +39,12 @@ public:
         return GetMemoryLayout().control_area;
     }
 
-    MessageQueue& OurMsgQueue() const noexcept final {
-        return GetMemoryLayout().queues[our_queue_idx_];
+    UserTextMsg& OurMsgPlace() const noexcept final {
+        return GetMemoryLayout().msg_places[our_queue_idx_];
     }
 
-    MessageQueue& TheirMsgQueue() const noexcept final {
-        return GetMemoryLayout().queues[their_queue_idx_];
+    UserTextMsg& TheirMsgPlace() const noexcept final {
+        return GetMemoryLayout().msg_places[their_queue_idx_];
     }
 
     system::Semaphore OurReadSemaphore() const noexcept final {
@@ -69,9 +71,9 @@ class IpcResourcesOwner final : public IpcResourcesBase {
 public:
     IpcResourcesOwner(std::size_t shm_byte_size,
                       std::initializer_list<unsigned short> sem_initial_values,
-                      unsigned char our_queue_idx, unsigned char their_queue_idx,
-                      unsigned short our_read_sem_idx, unsigned short their_write_sem_idx)
-        : IpcResourcesBase(our_queue_idx, their_queue_idx, our_read_sem_idx, their_write_sem_idx),
+                      IPCResourceIndices const& indices)
+        : IpcResourcesBase(indices.master_queue_idx, indices.slave_queue_idx,
+                           indices.master_read_sem_idx, indices.slave_write_sem_idx),
           shared_memory_(shm_byte_size),
           memory_layout_(reinterpret_cast<MemoryLayout*>(shared_memory_.Data())),
           semaphore_set_(std::move(sem_initial_values)) {}
@@ -101,10 +103,9 @@ private:
 
 class IpcResourcesView final : public IpcResourcesBase {
 public:
-    IpcResourcesView(int shm_id, int sem_set_id, unsigned char our_queue_idx,
-                     unsigned char their_queue_idx, unsigned short our_read_sem_idx,
-                     unsigned short their_write_sem_idx)
-        : IpcResourcesBase(our_queue_idx, their_queue_idx, our_read_sem_idx, their_write_sem_idx),
+    IpcResourcesView(int shm_id, int sem_set_id, IPCResourceIndices const& indices)
+        : IpcResourcesBase(indices.slave_queue_idx, indices.master_queue_idx,
+                           indices.slave_read_sem_idx, indices.master_write_sem_idx),
           shared_memory_(shm_id),
           memory_layout_(reinterpret_cast<MemoryLayout*>(shared_memory_.Data())),
           semaphore_set_(sem_set_id) {}

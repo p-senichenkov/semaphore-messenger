@@ -3,7 +3,6 @@
 #include <exception>
 #include <utility>
 
-#include "lib/const.h"
 #include "lib/handshake/handshake_connection.h"
 #include "lib/handshake/socket_utils.h"
 #include "lib/messages/handshake.h"
@@ -27,9 +26,9 @@ std::pair<IpcResourcesOwner, IpcIDs> MakeIpcResources() {
     };
     constexpr static std::initializer_list<unsigned short> kSemaphoreInitialValues{
             /* Master read = */ 0,
-            /* Master write = */ kQueueCapacity,
+            /* Master write = */ 1,
             /* Slave read = */ 0,
-            /* Slave write = */ kQueueCapacity,
+            /* Slave write = */ 1,
     };
 
     IpcResourcesOwner owner{kSharedMemoryByteSize, kSemaphoreInitialValues,
