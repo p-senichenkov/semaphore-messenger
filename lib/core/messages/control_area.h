@@ -7,6 +7,7 @@ namespace messenger {
 // such as shutdown signal. So I keep a single byte at the beginning of shared memory for such
 // control signals
 enum class EControlArea : uint8_t {
+    kNone = 0,
     // Shutdown immediately (and clean-up all IPC resources)
     kShutdown = 1,
     // Other values are reserved for future use

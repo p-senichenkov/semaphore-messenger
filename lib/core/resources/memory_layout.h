@@ -7,7 +7,7 @@ namespace messenger {
 // The exact shared memory layout
 struct MemoryLayout {
     // A single byte for "highest-priority" control signals, that should bypass synchronization
-    EControlArea control_area;
+    EControlArea control_area = EControlArea::kNone;
     // Two uni-directional message buffers
     UserTextMsg msg_places[2];
 };

@@ -3,11 +3,16 @@
 #include <cstddef>
 #include <memory>
 #include <string>
+#include <utility>
 
 #include "lib/core/messages/control_area.h"
 #include "lib/core/resources/holder.h"
 
 namespace messenger {
+struct ControlExit : public std::runtime_error {
+    ControlExit() : std::runtime_error("Exit byte is set") {}
+};
+
 // WARN: Calling a single function from multiple threads *is not* safe
 // Calling different functions concurrently *is* safe
 class MessageIO {
@@ -17,18 +22,18 @@ public:
         explicit WriteError(std::string&& msg) : std::runtime_error(msg) {}
     };
 
-    // TODO: Constructor
-    // TODO: Something else?
+    explicit MessageIO(std::unique_ptr<IIpcResources>&& resources)
+        : ipc_resources_(std::move(resources)) {}
 
     void Write(std::string&& message);
     bool CanWriteImmediately() const;
 
+    /// @throws ControlExit
     std::string Read();
+    // TODO: Most likely not needed, remove
     bool CanReadImmediately() const;
 
-    void SendControl(EControlArea control) {
-        // TODO:
-    }
+    void SendControl(EControlArea control);
 
 private:
     std::unique_ptr<IIpcResources> ipc_resources_;
