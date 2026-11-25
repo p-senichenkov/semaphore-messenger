@@ -11,9 +11,7 @@
 #include "lib/core/resources/holder.h"
 #include "lib/core/resources/memory_layout.h"
 
-using namespace messenger;
-using namespace messenger::handshake;
-
+namespace messenger::handshake {
 namespace {
 constexpr static auto kSharedMemoryByteSize = sizeof(MemoryLayout);
 constexpr static IPCResourceIndices kFixedIpcResourceIndices{
@@ -81,3 +79,4 @@ std::unique_ptr<IpcResourcesView> DoSlaveHandshake(pid_t master_pid) {
         throw;
     }
 }
+}  // namespace messenger::handshake

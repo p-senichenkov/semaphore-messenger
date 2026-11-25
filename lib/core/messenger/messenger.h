@@ -13,6 +13,8 @@
 namespace messenger {
 class IMessenger {
 public:
+    virtual ~IMessenger() = default;
+
     virtual void Write(std::string&& msg) = 0;
     virtual std::string WaitRead() = 0;
 
@@ -51,7 +53,7 @@ private:
 
 class MasterMessenger final : public MessengerBase {
 public:
-    MasterMessenger() : pid_(getpid()) {}
+    explicit MasterMessenger(pid_t pid) : pid_(pid) {}
 
     std::unique_ptr<IIpcResources> HandshakeImpl() const override {
         return handshake::DoMasterHandshake(pid_);

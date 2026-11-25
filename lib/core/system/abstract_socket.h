@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <string_view>
+#include <type_traits>
 
 namespace messenger::system {
 
@@ -20,13 +21,15 @@ public:
 
     template <typename T>
     void Send(T const& value) const {
-        SendRaw(&value, sizeof(value));
+        auto const* bytes = reinterpret_cast<std::byte const*>(&value);
+        SendRaw(bytes, sizeof(T));
     }
 
     template <typename T>
+        requires std::is_default_constructible_v<T>
     T Receive() const {
-        T value{};
-        RecvRaw(&value, sizeof(value));
+        T value;
+        RecvRaw(reinterpret_cast<std::byte*>(&value), sizeof(T));
         return value;
     }
 

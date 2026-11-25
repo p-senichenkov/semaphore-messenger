@@ -15,6 +15,8 @@
 namespace messenger {
 class IIpcResources {
 public:
+    virtual ~IIpcResources() = default;
+
     virtual EControlArea& ControlArea() noexcept = 0;
 
     virtual UserTextMsg& OurMsgPlace() noexcept = 0;

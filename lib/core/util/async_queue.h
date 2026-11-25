@@ -34,7 +34,7 @@ public:
 private:
     std::queue<Val> queue_;
 
-    std::mutex mutex_;
+    mutable std::mutex mutex_;
     std::condition_variable not_empty_cv_;
 };
 }  // namespace messenger::util

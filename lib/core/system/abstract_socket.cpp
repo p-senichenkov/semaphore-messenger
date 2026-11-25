@@ -1,4 +1,4 @@
-#include "lib/system/abstract_socket.h"
+#include "lib/core/system/abstract_socket.h"
 
 #include <cstddef>
 #include <string_view>
@@ -8,9 +8,9 @@
 #include <sys/un.h>
 
 #include "lib/core/system/system_error.h"
+#include "lib/core/util/ensure.h"
 
-using namespace messenger::system;
-
+namespace messenger::system {
 namespace {
 AbstractSocket MakeSocket() {
     int const fd = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
@@ -44,6 +44,7 @@ AbstractSocket::~AbstractSocket() {
 }
 
 AbstractSocket AbstractSocket::Accept(std::string_view name) const {
+    ENSURE(fd_ != -1);
     int fd;
     do {
         // TODO: Timeout here
@@ -86,6 +87,7 @@ AbstractSocket Connect(std::string_view name) {
 }
 
 void AbstractSocket::SendRaw(std::byte const* buffer, std::size_t byte_size) const {
+    ENSURE(fd_ != -1);
     while (byte_size) {
         auto const n = send(fd_, buffer, byte_size, MSG_NOSIGNAL);
 
@@ -105,6 +107,7 @@ void AbstractSocket::SendRaw(std::byte const* buffer, std::size_t byte_size) con
 }
 
 void AbstractSocket::RecvRaw(std::byte* buffer, std::size_t byte_size) const {
+    ENSURE(fd_ != -1);
     while (byte_size) {
         auto const n = ::recv(fd_, buffer, byte_size, 0);
 
@@ -122,3 +125,4 @@ void AbstractSocket::RecvRaw(std::byte* buffer, std::size_t byte_size) const {
         byte_size -= n;
     }
 }
+}  // namespace messenger::system
