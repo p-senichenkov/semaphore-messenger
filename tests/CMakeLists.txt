@@ -1,13 +1,13 @@
-include(FetchContent)
-FetchContent_Declare(
-  googletest
-  URL https://github.com/google/googletest/archive/a46a6012a133c7c0929fdae55b321c2fe65f3c5f.zip
-)
-FetchContent_MakeAvailable(googletest)
+enable_testing()
 
-set(NAME "${CMAKE_PROJECT_NAME}_tests")
-add_executable(${NAME} main.cpp test_handshake.cpp)
-target_link_libraries(${NAME} GTest::gtest_main)
+function(messenger_add_test name)
+    cmake_parse_arguments(arg "" "" "SRCS" ${ARGN})
 
-include(GoogleTest)
-gtest_discover_tests(${NAME} DISCOVERY_MODE PRE_TEST)
+    set(test_name "test_${name}")
+    add_executable("${test_name}")
+    target_sources("${test_name}" PRIVATE "${arg_SRCS}")
+    target_link_libraries("${test_name}" PRIVATE "${CMAKE_PROJECT_NAME}_core")
+    add_test(NAME "${name}" COMMAND "${test_name}")
+endfunction()
+
+messenger_add_test(handshake SRCS test_handshake.cpp)

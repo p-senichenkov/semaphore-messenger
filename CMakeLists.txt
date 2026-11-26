@@ -10,5 +10,4 @@ include_directories(".")
 add_subdirectory(cli)
 add_subdirectory(lib)
 
-enable_testing()
 add_subdirectory(tests)
