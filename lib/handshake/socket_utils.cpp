@@ -1,8 +1,8 @@
-#include "lib/core/handshake/socket_utils.h"
+#include "lib/handshake/socket_utils.h"
 
 #include <string>
 
-#include "lib/core/system/abstract_socket.h"
+#include "lib/system/abstract_socket.h"
 
 namespace {
 std::string MakeName(int pid) {

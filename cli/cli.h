@@ -10,8 +10,8 @@
 
 #include <sys/types.h>
 
-#include "lib/core/messenger/messenger.h"
-#include "lib/core/util/ensure.h"
+#include "lib/messenger/messenger.h"
+#include "lib/util/ensure.h"
 
 namespace cli {
 struct CliParams {

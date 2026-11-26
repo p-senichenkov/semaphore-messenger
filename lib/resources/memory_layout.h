@@ -1,7 +1,7 @@
 #pragma once
 
-#include "lib/core/messages/control_area.h"
-#include "lib/core/messages/user_text.h"
+#include "lib/messages/control_area.h"
+#include "lib/messages/user_text.h"
 
 namespace messenger {
 // The exact shared memory layout

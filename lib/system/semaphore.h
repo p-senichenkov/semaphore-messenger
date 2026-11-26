@@ -4,7 +4,7 @@
 
 #include <sys/sem.h>
 
-#include "lib/core/system/system_error.h"
+#include "lib/system/system_error.h"
 
 namespace messenger::system {
 /// @brief Non-owning semaphore handle

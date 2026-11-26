@@ -1,15 +1,15 @@
-#include "lib/core/handshake/handshake.h"
+#include "lib/handshake/handshake.h"
 
 #include <exception>
 #include <memory>
 #include <unistd.h>
 #include <utility>
 
-#include "lib/core/handshake/handshake_connection.h"
-#include "lib/core/handshake/socket_utils.h"
-#include "lib/core/messages/handshake.h"
-#include "lib/core/resources/holder.h"
-#include "lib/core/resources/memory_layout.h"
+#include "lib/handshake/handshake_connection.h"
+#include "lib/handshake/socket_utils.h"
+#include "lib/messages/handshake.h"
+#include "lib/resources/holder.h"
+#include "lib/resources/memory_layout.h"
 
 namespace messenger::handshake {
 namespace {

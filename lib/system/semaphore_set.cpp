@@ -1,4 +1,4 @@
-#include "lib/core/system/semaphore_set.h"
+#include "lib/system/semaphore_set.h"
 
 #include <cerrno>
 #include <cstddef>
@@ -8,8 +8,8 @@
 
 #include <sys/sem.h>
 
-#include "lib/core/system/semaphore.h"
-#include "lib/core/system/system_error.h"
+#include "lib/system/semaphore.h"
+#include "lib/system/system_error.h"
 
 using namespace messenger::system;
 

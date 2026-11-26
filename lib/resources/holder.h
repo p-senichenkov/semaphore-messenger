@@ -4,13 +4,13 @@
 #include <initializer_list>
 #include <vector>
 
-#include "lib/core/messages/control_area.h"
-#include "lib/core/messages/handshake.h"
-#include "lib/core/messages/user_text.h"
-#include "lib/core/resources/memory_layout.h"
-#include "lib/core/system/semaphore.h"
-#include "lib/core/system/semaphore_set.h"
-#include "lib/core/system/shared_memory.h"
+#include "lib/messages/control_area.h"
+#include "lib/messages/handshake.h"
+#include "lib/messages/user_text.h"
+#include "lib/resources/memory_layout.h"
+#include "lib/system/semaphore.h"
+#include "lib/system/semaphore_set.h"
+#include "lib/system/shared_memory.h"
 
 namespace messenger {
 class IIpcResources {

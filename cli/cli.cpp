@@ -12,7 +12,7 @@
 
 #include <sys/types.h>
 
-#include "lib/core/util/ensure.h"
+#include "lib/util/ensure.h"
 
 namespace {
 struct ParsingError : public std::runtime_error {

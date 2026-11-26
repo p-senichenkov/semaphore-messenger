@@ -7,10 +7,10 @@
 #include <thread>
 #include <utility>
 
-#include "lib/core/messenger/message_io.h"
-#include "lib/core/resources/holder.h"
-#include "lib/core/util/async_queue.h"
-#include "lib/core/util/ensure.h"
+#include "lib/messenger/message_io.h"
+#include "lib/resources/holder.h"
+#include "lib/util/async_queue.h"
+#include "lib/util/ensure.h"
 
 namespace messenger {
 class MessageQueue {

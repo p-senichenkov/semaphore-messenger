@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include "lib/core/messages/handshake.h"
-#include "lib/core/system/abstract_socket.h"
+#include "lib/messages/handshake.h"
+#include "lib/system/abstract_socket.h"
 
 namespace messenger::handshake {
 class Connection {

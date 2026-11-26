@@ -1,4 +1,4 @@
-#include "lib/core/system/abstract_socket.h"
+#include "lib/system/abstract_socket.h"
 
 #include <cstddef>
 #include <string_view>
@@ -7,8 +7,8 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 
-#include "lib/core/system/system_error.h"
-#include "lib/core/util/ensure.h"
+#include "lib/system/system_error.h"
+#include "lib/util/ensure.h"
 
 namespace messenger::system {
 namespace {

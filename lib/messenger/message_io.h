@@ -5,8 +5,8 @@
 #include <string>
 #include <utility>
 
-#include "lib/core/messages/control_area.h"
-#include "lib/core/resources/holder.h"
+#include "lib/messages/control_area.h"
+#include "lib/resources/holder.h"
 
 namespace messenger {
 struct ControlExit : public std::runtime_error {

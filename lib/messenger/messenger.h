@@ -5,10 +5,10 @@
 #include <unistd.h>
 #include <utility>
 
-#include "lib/core/handshake/handshake.h"
-#include "lib/core/messenger/message_queue.h"
-#include "lib/core/resources/holder.h"
-#include "lib/core/util/ensure.h"
+#include "lib/handshake/handshake.h"
+#include "lib/messenger/message_queue.h"
+#include "lib/resources/holder.h"
+#include "lib/util/ensure.h"
 
 namespace messenger {
 class IMessenger {

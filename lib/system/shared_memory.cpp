@@ -1,11 +1,11 @@
-#include "lib/core/system/shared_memory.h"
+#include "lib/system/shared_memory.h"
 
 #include <cstddef>
 
 #include <sys/ipc.h>
 #include <sys/shm.h>
 
-#include "lib/core/system/system_error.h"
+#include "lib/system/system_error.h"
 
 using namespace messenger::system;
 

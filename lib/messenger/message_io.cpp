@@ -1,12 +1,12 @@
-#include "lib/core/messenger/message_io.h"
+#include "lib/messenger/message_io.h"
 
 #include <algorithm>
 #include <cstring>
 #include <string>
 
-#include "lib/core/messages/control_area.h"
-#include "lib/core/messages/user_text.h"
-#include "lib/core/util/bit_flags.h"
+#include "lib/messages/control_area.h"
+#include "lib/messages/user_text.h"
+#include "lib/util/bit_flags.h"
 
 using namespace messenger;
 

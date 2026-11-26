@@ -1,12 +1,12 @@
 include(FetchContent)
 FetchContent_Declare(
-    googletest
-    URL https://github.com/google/googletest/archive/a46a6012a133c7c0929fdae55b321c2fe65f3c5f.zip
+  googletest
+  URL https://github.com/google/googletest/archive/a46a6012a133c7c0929fdae55b321c2fe65f3c5f.zip
 )
 FetchContent_MakeAvailable(googletest)
 
 set(NAME "${CMAKE_PROJECT_NAME}_tests")
-add_executable(${NAME} test_tests.cpp)
+add_executable(${NAME} main.cpp test_handshake.cpp)
 target_link_libraries(${NAME} GTest::gtest_main)
 
 include(GoogleTest)
