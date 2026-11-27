@@ -10,6 +10,7 @@
 #include "lib/messages/handshake.h"
 #include "lib/resources/holder.h"
 #include "lib/resources/memory_layout.h"
+#include "lib/util/log.h"
 
 namespace messenger::handshake {
 namespace {
@@ -32,6 +33,8 @@ constexpr static std::initializer_list<unsigned short> kSemaphoreInitialValues{
 }  // namespace
 
 std::unique_ptr<IpcResourcesOwner> DoMasterHandshake(pid_t pid) {
+    LOG(Debug) << "Master";
+
     SocketMaster socket_master{pid};
 
     // TODO: Timeout here?
@@ -61,6 +64,8 @@ std::unique_ptr<IpcResourcesOwner> DoMasterHandshake(pid_t pid) {
 }
 
 std::unique_ptr<IpcResourcesView> DoSlaveHandshake(pid_t master_pid) {
+    LOG(Debug) << "Slave";
+
     HandshakeConnection connection{SocketSlave(master_pid)};
 
     try {

@@ -3,6 +3,12 @@
 #include <cstddef>
 #include <string_view>
 #include <type_traits>
+#include <utility>
+
+#include <sys/socket.h>
+
+#include "lib/system/system_error.h"
+#include "lib/util/ensure.h"
 
 namespace messenger::system {
 
@@ -11,7 +17,22 @@ class AbstractSocket {
 public:
     explicit AbstractSocket(int fd) noexcept : fd_(fd) {}
 
-    ~AbstractSocket();
+    AbstractSocket(AbstractSocket const&) = delete;
+    AbstractSocket& operator=(AbstractSocket const&) = delete;
+
+    AbstractSocket(AbstractSocket&& other) noexcept : fd_(std::exchange(other.fd_, -1)) {}
+
+    AbstractSocket& operator=(AbstractSocket&& other) noexcept {
+        if (this != &other) {
+            Close();
+            fd_ = std::exchange(other.fd_, 0);
+        }
+        return *this;
+    }
+
+    ~AbstractSocket() {
+        Close();
+    }
 
     int Fd() const noexcept {
         return fd_;
@@ -21,25 +42,40 @@ public:
 
     template <typename T>
     void Send(T const& value) const {
-        auto const* bytes = reinterpret_cast<std::byte const*>(&value);
-        SendRaw(bytes, sizeof(T));
+        ENSURE(fd_ != -1);
+
+        auto const n = send(fd_, &value, sizeof(value), MSG_NOSIGNAL);
+        if (n == -1) {
+            throw SystemError{"send"};
+        }
+        ENSURE(static_cast<std::size_t>(n) == sizeof(value));
     }
 
     template <typename T>
         requires std::is_default_constructible_v<T>
     T Receive() const {
+        ENSURE(fd_ != -1);
+
         T value;
-        RecvRaw(reinterpret_cast<std::byte*>(&value), sizeof(T));
+
+        auto const n = recv(fd_, &value, sizeof(value), MSG_TRUNC);
+        if (n == -1) {
+            throw SystemError{"recv"};
+        }
+        if (n == 0) {
+            throw std::runtime_error("Abstract socket Receive: peer disconneceted");
+        }
+        ENSURE(static_cast<std::size_t>(n) == sizeof(value));
+
         return value;
     }
 
 private:
-    void SendRaw(std::byte const* buffer, std::size_t byte_size) const;
-    void RecvRaw(std::byte* buffer, std::size_t byte_size) const;
+    void Close();
 
     int fd_ = -1;
 };
 
-AbstractSocket Listen(std::string_view name, int backlog = -1);
+AbstractSocket Listen(std::string_view name);
 AbstractSocket Connect(std::string_view name);
 }  // namespace messenger::system

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <utility>
 
 #include "lib/messages/handshake.h"
 #include "lib/system/abstract_socket.h"
@@ -8,7 +9,7 @@
 namespace messenger::handshake {
 class Connection {
 public:
-    explicit Connection(system::AbstractSocket socket) : socket_(socket) {}
+    explicit Connection(system::AbstractSocket&& socket) : socket_(std::move(socket)) {}
 
     void Send(ControlMsg const& msg) {
         socket_.Send(msg);

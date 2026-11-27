@@ -9,3 +9,4 @@ target_sources(
          system/shared_memory.cpp
          messenger/message_io.cpp
          messenger/message_queue.cpp)
+target_compile_definitions(${NAME} PUBLIC MSG_LOG_LEVEL "${MSG_LOG_LEVEL}")

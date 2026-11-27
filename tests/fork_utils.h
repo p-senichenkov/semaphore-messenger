@@ -29,6 +29,7 @@ void ForkTest(std::function<void(pid_t)> parent_work, std::function<void(pid_t)>
         ASSERT(WEXITSTATUS(status) == 0);
     } else {
         child_work(getppid());
+        _exit(0);
     }
 }
 }  // namespace tests

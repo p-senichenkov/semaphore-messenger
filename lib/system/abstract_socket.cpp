@@ -13,7 +13,7 @@
 namespace messenger::system {
 namespace {
 AbstractSocket MakeSocket() {
-    int const fd = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
+    int const fd = socket(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC, 0);
 
     if (fd == -1) {
         throw SystemError{"socket"};
@@ -37,12 +37,6 @@ std::pair<sockaddr_un, socklen_t> GetAddress(std::string_view name) {
 }
 }  // namespace
 
-AbstractSocket::~AbstractSocket() {
-    if (fd_ >= 0) {
-        close(fd_);
-    }
-}
-
 AbstractSocket AbstractSocket::Accept(std::string_view name) const {
     ENSURE(fd_ != -1);
     int fd;
@@ -57,7 +51,14 @@ AbstractSocket AbstractSocket::Accept(std::string_view name) const {
     return AbstractSocket{fd};
 }
 
-AbstractSocket Listen(std::string_view name, int backlog) {
+void AbstractSocket::Close() {
+    if (fd_ >= 0) {
+        close(fd_);
+    }
+    fd_ = -1;
+}
+
+AbstractSocket Listen(std::string_view name) {
     auto const [addr, len] = GetAddress(name);
     AbstractSocket sock = MakeSocket();
 
@@ -65,7 +66,7 @@ AbstractSocket Listen(std::string_view name, int backlog) {
         throw SystemError{"bind"};
     }
 
-    if (listen(sock.Fd(), backlog) == -1) {
+    if (listen(sock.Fd(), 1) == -1) {
         throw SystemError{"listen"};
     }
 
@@ -84,45 +85,5 @@ AbstractSocket Connect(std::string_view name) {
     }
 
     return sock;
-}
-
-void AbstractSocket::SendRaw(std::byte const* buffer, std::size_t byte_size) const {
-    ENSURE(fd_ != -1);
-    while (byte_size) {
-        auto const n = send(fd_, buffer, byte_size, MSG_NOSIGNAL);
-
-        if (n == -1) {
-            if (errno == EINTR) {
-                continue;
-            }
-            throw SystemError{"send"};
-        }
-        if (n == 0) {
-            throw std::runtime_error("send: no progress");
-        }
-
-        buffer += n;
-        byte_size -= n;
-    }
-}
-
-void AbstractSocket::RecvRaw(std::byte* buffer, std::size_t byte_size) const {
-    ENSURE(fd_ != -1);
-    while (byte_size) {
-        auto const n = ::recv(fd_, buffer, byte_size, 0);
-
-        if (n == -1) {
-            if (errno == EINTR) {
-                continue;
-            }
-            throw SystemError{"recv"};
-        }
-        if (n == 0) {
-            throw std::runtime_error("recv: peer disconnected");
-        }
-
-        buffer += n;
-        byte_size -= n;
-    }
 }
 }  // namespace messenger::system
