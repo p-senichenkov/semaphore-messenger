@@ -23,16 +23,12 @@ public:
     AbstractSocket(AbstractSocket&& other) noexcept : fd_(std::exchange(other.fd_, -1)) {}
 
     AbstractSocket& operator=(AbstractSocket&& other) noexcept {
-        if (this != &other) {
-            Close();
-            fd_ = std::exchange(other.fd_, 0);
-        }
+        AbstractSocket tmp{std::move(other)};
+        Swap(tmp);
         return *this;
     }
 
-    ~AbstractSocket() {
-        Close();
-    }
+    ~AbstractSocket();
 
     int Fd() const noexcept {
         return fd_;
@@ -71,7 +67,9 @@ public:
     }
 
 private:
-    void Close();
+    void Swap(AbstractSocket& other) {
+        std::swap(fd_, other.fd_);
+    }
 
     int fd_ = -1;
 };

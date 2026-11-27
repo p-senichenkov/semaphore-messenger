@@ -51,11 +51,10 @@ AbstractSocket AbstractSocket::Accept(std::string_view name) const {
     return AbstractSocket{fd};
 }
 
-void AbstractSocket::Close() {
+AbstractSocket::~AbstractSocket() {
     if (fd_ >= 0) {
         close(fd_);
     }
-    fd_ = -1;
 }
 
 AbstractSocket Listen(std::string_view name) {

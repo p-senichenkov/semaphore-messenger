@@ -12,6 +12,7 @@
 
 #include <sys/types.h>
 
+#include "lib/messages/user_text.h"
 #include "lib/util/ensure.h"
 
 namespace {
@@ -92,8 +93,16 @@ void CliBase::MainLoop() {
             working_ = false;
             break;
         }
-        messenger_->Write(std::move(line));
+        if (line.size() >= messenger::kMaxPayloadSizeBytes) {
+            std::cout << "Message is too long! Max size is " << messenger::kMaxPayloadSizeBytes
+                      << '\n';
+        } else if (line.empty()) {
+            std::cout << "Skipping empty message...\n";
+        } else {
+            messenger_->Write(std::move(line));
+        }
     }
+
     std::cout << "Stopping...\n";
 }
 

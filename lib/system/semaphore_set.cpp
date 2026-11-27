@@ -47,18 +47,14 @@ SemaphoreSet::SemaphoreSet(std::initializer_list<unsigned short> initial_values)
     SemctlArg arg{};
     arg.array = values.data();
     if (semctl(id_, 0, SETALL, arg) == -1) {
-        int err_code = errno;
-        Reset();
-        throw SystemError(err_code, "semctl(SETALL)");
+        throw SystemError("semctl(SETALL)");
     }
 }
 
-void SemaphoreSet::Reset() noexcept {
+SemaphoreSet::~SemaphoreSet() {
     if (count_ > 0) {
         semctl(id_, 0, IPC_RMID);
     }
-
-    count_ = 0;
 }
 
 std::vector<Semaphore> SemaphoreSet::Semaphores() const {

@@ -26,19 +26,27 @@ public:
     virtual system::Semaphore OurWriteSemaphore() noexcept = 0;
     virtual system::Semaphore TheirReadSemaphore() noexcept = 0;
     virtual system::Semaphore TheirWriteSemaphore() noexcept = 0;
-
-    // Handshake socket should be closed after the handshake, so we don't keep it here
 };
 
 class IpcResourcesBase : public IIpcResources {
 public:
-    IpcResourcesBase(unsigned char our_queue_idx, unsigned char their_queue_idx,
-                     unsigned short our_read_sem_idx, unsigned short our_write_sem_idx,
-                     unsigned short their_read_sem_idx, unsigned short their_write_sem_idx)
-        : our_queue_idx_(our_queue_idx),
-          their_queue_idx_(their_queue_idx),
-          our_read_sem_idx_(our_read_sem_idx),
-          their_write_sem_idx_(their_write_sem_idx) {}
+    struct RelativeIndices {
+        unsigned char our_queue_idx;
+        unsigned char their_queue_idx;
+
+        unsigned short our_read_sem_idx;
+        unsigned short our_write_sem_idx;
+        unsigned short their_read_sem_idx;
+        unsigned short their_write_sem_idx;
+    };
+
+    explicit IpcResourcesBase(RelativeIndices const& indices)
+        : our_queue_idx_(indices.our_queue_idx),
+          their_queue_idx_(indices.their_queue_idx),
+          our_read_sem_idx_(indices.our_read_sem_idx),
+          our_write_sem_idx_(indices.our_write_sem_idx),
+          their_read_sem_idx_(indices.their_read_sem_idx),
+          their_write_sem_idx_(indices.their_write_sem_idx) {}
 
     EControlArea& ControlArea() noexcept final {
         return GetMemoryLayout().control_area;
@@ -87,9 +95,12 @@ public:
     IpcResourcesOwner(std::size_t shm_byte_size,
                       std::initializer_list<unsigned short> sem_initial_values,
                       IPCResourceIndices const& indices)
-        : IpcResourcesBase(indices.master_queue_idx, indices.slave_queue_idx,
-                           indices.master_read_sem_idx, indices.master_write_sem_idx,
-                           indices.slave_read_sem_idx, indices.slave_write_sem_idx),
+        : IpcResourcesBase({.our_queue_idx = indices.master_queue_idx,
+                            .their_queue_idx = indices.slave_queue_idx,
+                            .our_read_sem_idx = indices.master_read_sem_idx,
+                            .our_write_sem_idx = indices.master_write_sem_idx,
+                            .their_read_sem_idx = indices.slave_read_sem_idx,
+                            .their_write_sem_idx = indices.slave_write_sem_idx}),
           shared_memory_(shm_byte_size),
           memory_layout_(reinterpret_cast<MemoryLayout*>(shared_memory_.Data())),
           semaphore_set_(std::move(sem_initial_values)),
@@ -122,9 +133,12 @@ private:
 class IpcResourcesView final : public IpcResourcesBase {
 public:
     IpcResourcesView(int shm_id, int sem_set_id, IPCResourceIndices const& indices)
-        : IpcResourcesBase(indices.slave_queue_idx, indices.master_queue_idx,
-                           indices.slave_read_sem_idx, indices.slave_read_sem_idx,
-                           indices.master_read_sem_idx, indices.master_write_sem_idx),
+        : IpcResourcesBase({.our_queue_idx = indices.slave_queue_idx,
+                            .their_queue_idx = indices.master_queue_idx,
+                            .our_read_sem_idx = indices.slave_read_sem_idx,
+                            .our_write_sem_idx = indices.slave_write_sem_idx,
+                            .their_read_sem_idx = indices.master_read_sem_idx,
+                            .their_write_sem_idx = indices.master_write_sem_idx}),
           shared_memory_(shm_id),
           memory_layout_(reinterpret_cast<MemoryLayout*>(shared_memory_.Data())),
           semaphore_set_(sem_set_id),

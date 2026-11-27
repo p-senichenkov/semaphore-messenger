@@ -7,6 +7,7 @@
 #include <thread>
 #include <utility>
 
+#include "lib/messages/control_area.h"
 #include "lib/messenger/message_io.h"
 #include "lib/resources/holder.h"
 #include "lib/util/async_queue.h"
@@ -43,14 +44,15 @@ public:
     }
 
     std::string WaitRead() {
-        ENSURE_MSG(reading_thread_.joinable(), "Start() must be called before Write()");
-        return read_queue_.WaitPop();
+        ENSURE_MSG(reading_thread_.joinable(), "Start() must be called before WaitRead()");
+        auto msg = read_queue_.WaitPop();
+        return msg;
     }
 
     void Start();
 
-    // TODO: Do we need this? Should stop well in destructor
     void Stop() {
+        message_io_.SendControl(EControlArea::kShutdown);
         working_ = false;
     }
 

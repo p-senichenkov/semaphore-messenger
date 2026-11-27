@@ -28,7 +28,11 @@ public:
     void Work() {
         messenger_ = Init();
         ENSURE(messenger_);
-        Handshake();
+        std::cout << "Performing handshake...\n";
+        messenger_->Handshake();
+        std::cout << "Handshake successful. Starting messenger...\n";
+        messenger_->Start();
+        std::cout << "Messenger started\n";
         MainLoop();
     }
 
@@ -40,10 +44,6 @@ protected:
     }
 
 private:
-    void Handshake() const {
-        messenger_->Handshake();
-    }
-
     void MainLoop();
 
     void Listen() {
