@@ -30,9 +30,7 @@ public:
         ENSURE(messenger_);
         std::cout << "Performing handshake...\n";
         messenger_->Handshake();
-        std::cout << "Handshake successful. Starting messenger...\n";
-        messenger_->Start();
-        std::cout << "Messenger started\n";
+        std::cout << "Handshake successful\n";
         MainLoop();
     }
 

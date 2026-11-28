@@ -18,9 +18,8 @@ public:
     virtual void Write(std::string&& msg) = 0;
     virtual std::string WaitRead() = 0;
 
-    // I don't want to manage statuses, so just provide separate functions
+    // I don't want to manage statuses, so just provide a separate function
     virtual void Handshake() = 0;
-    virtual void Start() = 0;
 };
 
 class MessengerBase : public IMessenger {
@@ -37,10 +36,6 @@ public:
 
     void Handshake() final {
         message_queue_ = std::make_unique<MessageQueue>(HandshakeImpl());
-    }
-
-    void Start() override {
-        ENSURE_MSG(message_queue_, "Handshake() must be called before Start()");
         message_queue_->Start();
     }
 
