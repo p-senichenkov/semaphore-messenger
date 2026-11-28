@@ -36,7 +36,6 @@ public:
 
     void Handshake() final {
         message_queue_ = std::make_unique<MessageQueue>(HandshakeImpl());
-        message_queue_->Start();
     }
 
 protected:

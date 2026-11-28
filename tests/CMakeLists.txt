@@ -10,3 +10,4 @@ endfunction()
 
 messenger_add_test(handshake SRCS test_handshake.cpp)
 messenger_add_test(messenger SRCS test_messenger.cpp)
+messenger_add_test(unit SRCS test_unit.cpp)

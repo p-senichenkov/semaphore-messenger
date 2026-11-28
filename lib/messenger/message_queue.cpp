@@ -1,17 +1,12 @@
 #include "message_queue.h"
 
-#include <thread>
+#include <stop_token>
 #include <utility>
 
 using namespace messenger;
 
-void MessageQueue::Start() {
-    writing_thread_ = std::jthread{[this]() { WriteMessages(); }};
-    reading_thread_ = std::jthread{[this]() { ReadMessages(); }};
-}
-
-void MessageQueue::ReadMessages() {
-    while (working_) {
+void MessageQueue::ReadMessages(std::stop_token token) {
+    while (!token.stop_requested()) {
         auto msg = message_io_.Read();
         read_queue_.Push(std::move(msg));
         if (on_read_queue_size_change_) {
@@ -20,8 +15,8 @@ void MessageQueue::ReadMessages() {
     }
 }
 
-void MessageQueue::WriteMessages() {
-    while (working_) {
+void MessageQueue::WriteMessages(std::stop_token token) {
+    while (!token.stop_requested()) {
         auto msg = write_queue_.WaitPop();
         if (on_write_queue_size_change_) {
             on_write_queue_size_change_(write_queue_.Size());

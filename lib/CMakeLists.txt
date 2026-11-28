@@ -8,5 +8,6 @@ target_sources(
          system/semaphore_set.cpp
          system/shared_memory.cpp
          messenger/message_io.cpp
-         messenger/message_queue.cpp)
+         messenger/message_queue.cpp
+         util/async_threads.cpp)
 target_compile_definitions(${NAME} PUBLIC MSG_LOG_LEVEL "${MSG_LOG_LEVEL}")
